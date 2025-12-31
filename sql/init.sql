@@ -1,7 +1,21 @@
--- Invoice Reconciliation System
--- Database Initialization
+-- =====================================================
+-- Invoice Reconciliation System - Database Schema
+-- =====================================================
+-- This file creates all 7 tables needed for the system
+-- It runs automatically when PostgreSQL container starts
+-- =====================================================
 
--- This file will be automatically executed when the database starts
+-- Clean slate: Drop tables if they exist (useful for rebuilding)
 
--- Placeholder for now
-SELECT 'Database initialized!' AS status;
+DROP TABLE IF EXISTS companies CASCADE;
+
+CREATE TABLE companies (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(100) NOT NULL,
+	created_at TIMESTAMP DEFAULT NOW(),
+	active BOOLEAN DEFAULT TRUE
+);
+
+INSERT INTO companies (name) VALUES ('Demo Company Ltd');
+
+SELECT * FROM companies;
