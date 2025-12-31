@@ -72,3 +72,28 @@ INSERT INTO invoices (company_id, customer_id, invoice_number, amount, issue_dat
 
 -- Verify
 SELECT * FROM invoices;
+
+CREATE TABLE payments (
+	id SERIAL PRIMARY KEY,
+	company_id INTEGER NOT NULL,
+	customer_id INTEGER NOT NULL,
+	external_id VARCHAR(100) NOT NULL UNIQUE,
+	amount DECIMAL(10, 2) NOT NULL CHECK (amount > 0),
+	currency VARCHAR(3) DEFAULT 'EUR',
+	payment_date DATE NOT NULL,
+	reference TEXT,
+	created_at TIMESTAMP DEFAULT NOW(),
+	FOREIGN KEY (company_id) REFERENCES companies(id),
+	FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE INDEX idx_payments_company ON payments(company_id);
+CREATE INDEX idx_payments_customer ON payments(customer_id);
+CREATE INDEX idx_payments_external_id ON payments(external_id);
+CREATE INDEX idx_payments_date ON payments(payment_date);
+
+INSERT INTO payments (company_id, customer_id, external_id, amount, payment_date, reference) VALUES
+    (1, 1, 'BANK-REF-001', 5000.00, '2024-02-01', 'Payment for INV-001'),
+    (1, 2, 'BANK-REF-002', 1500.00, '2024-02-05', 'Partial payment');
+
+SELECT * FROM payments;
