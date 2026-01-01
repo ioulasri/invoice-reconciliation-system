@@ -24,3 +24,32 @@ GROUP BY c.id, c.name, c.email
 HAVING SUM(i.amount) > 0
 
 ORDER BY total_amount_due DESC;
+
+-- =====================================================
+-- QUERY 2: Unmatched Payments
+-- =====================================================
+-- Shows payments that haven't been reconciled yet
+-- Used by: Finance team to identify unallocated funds
+-- =====================================================
+
+SELECT
+	p.external_id,
+	p.payment_date,
+	c.name AS customer_name,
+	p.amount AS payment_amount,
+	COALESCE(SUM(r.matched_amount), 0) AS amount_matched,
+	p.amount - COALESCE(SUM(r.matched_amount), 0) AS amount_remaining,
+	CASE
+		WHEN SUM(r.matched_amount) IS NULL THEN 'FULLY_UNMATCHED'
+		WHEN p.amount > SUM(r.matched_amount) THEN 'PARTIALLY_MATCHED'
+		ELSE 'FULLY_MATCHED'
+	END AS match_status
+
+FROM payments p
+JOIN customers c ON p.customer_id = c.id
+LEFT JOIN reconciliations r on p.id = r.payment_id
+	AND r.status != 'REJECTED'
+WHERE p.company_id = 1
+GROUP BY p.id, p.external_id, p.payment_date, c.name, p.amount
+HAVING p.amount > COALESCE(SUM(r.matched_amount), 0)
+ORDER BY p.payment_date ASC;
