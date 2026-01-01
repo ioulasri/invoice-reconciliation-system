@@ -53,3 +53,27 @@ WHERE p.company_id = 1
 GROUP BY p.id, p.external_id, p.payment_date, c.name, p.amount
 HAVING p.amount > COALESCE(SUM(r.matched_amount), 0)
 ORDER BY p.payment_date ASC;
+
+-- =====================================================
+-- QUERY 3: Reconciliation Status Report
+-- =====================================================
+-- Dashboard showing reconciliation performance metrics
+-- Used by: Management for KPI tracking
+-- =====================================================
+
+SELECT
+	TO_CHAR(r.matched_at, 'YYYY-MM') AS month,
+	COUNT(*) AS total_reconciliations,
+	COUNT(CASE WHEN r.status = 'AUTO_MATCHED' THEN 1 END) AS auto_matched,
+	COUNT(CASE WHEN r.status = 'PENDING_REVIEW' THEN 1 END) AS pending_review,
+	COUNT(CASE WHEN r.status = 'REJECTED' THEN 1 END) AS rejected,
+	ROUND(
+		100.0 * COUNT(CASE WHEN r.status = 'AUTO_MATCHED' THEN 1 END) / COUNT(*), 2
+	) AS auto_match_rate_percent,
+	SUM(r.matched_amount) AS total_amount_reconcilied,
+	ROUND(AVG(r.confidence_score), 2) AS avg_confidence_score
+
+FROM reconciliations r
+WHERE r.company_id = 1
+GROUP BY TO_CHAR(r.matched_at, 'YYYY-MM')
+ORDER BY month DESC;
