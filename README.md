@@ -50,7 +50,7 @@ The system uses PostgreSQL with 7 core tables:
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone git@github.com:ioulasri/invoice-reconciliation-system.git
 cd invoice-reconciliation-system
 ```
 
@@ -66,20 +66,15 @@ This will:
 
 ### Database Access
 
-Connect to the PostgreSQL database:
+Connect to the PostgreSQL database using credentials from your docker-compose.yml:
 
 ```bash
 # Using Docker exec
-docker exec -it reconciliation_db psql -U reconciliation_user -d invoice_reconciliation
+docker exec -it reconciliation_db psql -U <POSTGRES_USER> -d invoice_reconciliation
 
 # Using local psql client
-psql -h localhost -p 5432 -U reconciliation_user -d invoice_reconciliation
+psql -h localhost -p 5432 -U <POSTGRES_USER> -d invoice_reconciliation
 ```
-
-Default credentials:
-- **User**: reconciliation_user
-- **Password**: reconciliation_password_123_321
-- **Database**: invoice_reconciliation
 
 ## Usage
 
@@ -121,10 +116,10 @@ The system includes 5 pre-built analytical queries in `sql/queries.sql`:
 
 ```bash
 # Execute from file
-docker exec -it reconciliation_db psql -U reconciliation_user -d invoice_reconciliation -f /docker-entrypoint-initdb.d/queries.sql
+docker exec -it reconciliation_db psql -U <POSTGRES_USER> -d invoice_reconciliation -f /docker-entrypoint-initdb.d/queries.sql
 
 # Or copy-paste individual queries in psql
-docker exec -it reconciliation_db psql -U reconciliation_user -d invoice_reconciliation
+docker exec -it reconciliation_db psql -U <POSTGRES_USER> -d invoice_reconciliation
 # Then paste your query
 ```
 
@@ -161,10 +156,12 @@ Configure database connection in `docker-compose.yml`:
 ```yaml
 POSTGRES_HOST: db
 POSTGRES_PORT: 5432
-POSTGRES_USER: reconciliation_user
-POSTGRES_PASSWORD: reconciliation_password_123_321
+POSTGRES_USER: <your_username>
+POSTGRES_PASSWORD: <your_secure_password>
 POSTGRES_DB: invoice_reconciliation
 ```
+
+**Note**: This is a demo project. Set strong passwords in production environments.
 
 ## Sample Data
 
