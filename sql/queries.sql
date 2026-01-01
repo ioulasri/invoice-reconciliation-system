@@ -77,3 +77,48 @@ FROM reconciliations r
 WHERE r.company_id = 1
 GROUP BY TO_CHAR(r.matched_at, 'YYYY-MM')
 ORDER BY month DESC;
+
+-- =====================================================
+-- QUERY 4: Collection Rate by Customer
+-- =====================================================
+-- Analyzes customer payment behavior (on-time vs late)
+-- Used by: Credit department for risk assessment
+-- =====================================================
+
+SELECT
+	c.name AS customer_name,
+	COUNT(DISTINCT i.id) AS total_invoices,
+	COUNT(DISTINCT CASE
+		WHEN r.id IS NOT NULL THEN i.id
+		END) AS paid_invoices,
+	ROUND(
+		100.0 * COUNT(DISTINCT CASE WHEN r.id IS NOT NULL THEN i.id END)
+		/ NULLIF(COUNT(DISTINCT i.id), 0), 2
+	) AS collection_rate_percent,
+	COUNT (DISTINCT CASE
+		WHEN r.matched_at <= i.due_date THEN i.id
+		END) AS paid_on_time,
+	COUNT(DISTINCT CASE 
+        WHEN r.matched_at > i.due_date THEN i.id 
+    	END) AS paid_late,
+	ROUND(
+		AVG(CASE
+			WHEN r.matched_at IS NOT NULL
+			THEN r.matched_at::date - i.due_date
+		END),
+		1
+	) AS avg_days_late,
+	SUM(CASE
+		WHEN i.status IN ('OPEN', 'PARTIALLY_MATCHED')
+		THEN i.amount
+		ELSE 0
+	END) AS outstanding_balance
+
+FROM customers c
+LEFT JOIN invoices i ON c.id = i.customer_id
+LEFT JOIN reconciliations r ON i.id = r.invoice_id
+	AND r.status IN ('AUTO_MATCHED', 'PENDING_REVIEW')
+WHERE c.company_id = 1
+GROUP BY c.id, c.name
+ORDER BY collection_rate_percent DESC;
+
