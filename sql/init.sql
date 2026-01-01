@@ -7,8 +7,8 @@
 
 -- Clean slate: Drop tables if they exist (useful for rebuilding)
 DROP TABLE IF EXISTS reconciliation_audit_log CASCADE;
-DROP TABLE IF EXISTS reconciliation_policies CASCADE;
 DROP TABLE IF EXISTS reconciliations CASCADE;
+DROP TABLE IF EXISTS reconciliation_policies CASCADE;
 DROP TABLE IF EXISTS payments CASCADE;
 DROP TABLE IF EXISTS invoices CASCADE;
 DROP TABLE IF EXISTS customers CASCADE;
@@ -72,8 +72,8 @@ INSERT INTO invoices (company_id, customer_id, invoice_number, amount, issue_dat
     (1, 1, 'INV-001', 5000.00, '2024-01-01', '2024-02-01', 'OPEN'),
     (1, 1, 'INV-002', 3000.00, '2024-01-15', '2024-02-15', 'OPEN'),
     (1, 2, 'INV-003', 2500.00, '2024-01-20', '2024-02-20', 'OPEN'),
-    (1, 2, 'INV-004', 2500.00, '2024-01-20', '2024-02-20', 'OPEN'),
-    (1, 2, 'INV-005', 2500.00, '2024-01-20', '2024-02-20', 'OPEN');
+    (1, 2, 'INV-004', 1800.00, '2024-01-25', '2024-02-25', 'OPEN'),
+	(1, 1, 'INV-005', 7500.00, '2024-02-01', '2024-03-01', 'OPEN');
 
 -- Verify
 SELECT * FROM invoices;
@@ -137,6 +137,8 @@ CREATE TABLE reconciliation_policies (
 	created_at TIMESTAMP DEFAULT NOW(),
 	FOREIGN KEY (company_id) REFERENCES companies(id)
 );
+
+CREATE INDEX idx_reconciliation_policies_company ON reconciliation_policies(company_id);
 
 INSERT INTO reconciliation_policies (company_id, auto_match_threshold, max_amount_variance, max_days_late) VALUES
 	(1, 95, 50.00, 30);
