@@ -261,14 +261,23 @@ docker-compose restart db
 chmod 644 sql/init.sql sql/queries.sql
 ```
 
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
 ## License
 
-[Specify your license here]
-
-## Contributors
-
-[Add contributor information]
+This project is available for educational and demonstration purposes.
 
 ## Support
 
-For issues and questions, please [create an issue/contact information].
+For issues, questions, or suggestions:
+- Open an issue on [GitHub Issues](https://github.com/ioulasri/invoice-reconciliation-system/issues)
+- Review existing issues before creating new ones
+- Provide detailed information including error messages and reproduction steps
