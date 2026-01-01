@@ -122,3 +122,45 @@ WHERE c.company_id = 1
 GROUP BY c.id, c.name
 ORDER BY collection_rate_percent DESC;
 
+-- =====================================================
+-- QUERY 5: Audit Trail for Reconciliation
+-- =====================================================
+-- Complete audit history showing all actions
+-- Used by: Compliance team for regulatory audits
+-- =====================================================
+
+SELECT
+	a.id AS audit_id,
+	a.performed_at AS action_timestamp,
+	a.action,
+	a.performed_by,
+	a.notes,
+	-- Reconciliation details
+	r.matched_amount,
+	r.confidence_score,
+	r.status AS current_status,
+	-- Invoice details
+	i.invoice_number,
+	i.amount AS invoice_amount,
+	i.due_date,
+	-- Payment details
+	p.external_id AS payment_reference,
+	p.amount AS payment_amount,
+	p.payment_date,
+	-- Customer details
+	c.name as customer_name,
+	-- Calculated fields
+	CONCAT(
+		'Reconciliation #', r.id, ': ',
+		'Matched EUR ', r.matched_amount, ' ',
+		'from payment', p.external_id, ' ',
+		'to_invoice', i.invoice_number 
+	) AS reconciliation_summary
+FROM reconciliation_audit_log a
+JOIN reconciliations r ON a.reconciliation_id = r.id
+JOIN invoices i ON r.invoice_id = i.id
+JOIN payments p ON r.payment_id = p.id
+JOIN customers c ON i.customer_id = c.id
+WHERE r.company_id = 1
+	AND r.id = 1
+ORDER BY a.performed_at DESC;
