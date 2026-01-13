@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:14
+    image: postgres:15
     container_name: reconciliation_db
     restart: always
     environment:
@@ -10,9 +10,9 @@ services:
       POSTGRES_PASSWORD: reconciliation_password_123_321
       POSTGRES_DB: invoice_reconciliation
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - posgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sql/queries.sql:/docker-entrypoint-initdb.d/queries.sql
     networks:
@@ -38,7 +38,7 @@ services:
     command: tail -f /dev/null
 
 volumes:
-  posgres_data:
+  postgres_data:
 networks:
   reconciliation_network:
     driver: bridge
